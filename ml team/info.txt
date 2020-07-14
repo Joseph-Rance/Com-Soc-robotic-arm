@@ -4,5 +4,5 @@
 
 
 Colab links (feel free to add more here if u make a new notebook):
-Main: 
+Main: https://colab.research.google.com/drive/11H7IJjVRcShN0_nzNyub1ZumFrAbFeuA?usp=sharing 
 Unsupervised stuff: https://colab.research.google.com/drive/1QtYmwFmDaaU6TA7qNMkDr1YqKMa0O2jh?usp=sharing
