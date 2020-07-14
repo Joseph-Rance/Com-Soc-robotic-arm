@@ -1,3 +1,8 @@
 1. Me and Josh working on the unsupervised learning
 2. Pratyaksh and Arna working on the "FANCY TECHNIQUES"
 3. Ben and Alex working on the image to array function and the get difference function
+
+
+Colab links (feel free to add more here if u make a new notebook):
+Main: 
+Unsupervised stuff: https://colab.research.google.com/drive/1QtYmwFmDaaU6TA7qNMkDr1YqKMa0O2jh?usp=sharing
