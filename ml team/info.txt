@@ -5,4 +5,6 @@
 
 Colab links (feel free to add more here if u make a new notebook):
 Main: https://colab.research.google.com/drive/11H7IJjVRcShN0_nzNyub1ZumFrAbFeuA?usp=sharing 
-Unsupervised stuff: https://colab.research.google.com/drive/1QtYmwFmDaaU6TA7qNMkDr1YqKMa0O2jh?usp=sharing
+Unsupervised stuff:
+https://colab.research.google.com/drive/1QtYmwFmDaaU6TA7qNMkDr1YqKMa0O2jh?usp=sharing
+https://colab.research.google.com/drive/1BvMeZql1o1PW_y1TawYh4-rWYUTv4h-0?usp=sharing
