@@ -8,7 +8,7 @@ Main Repo: https://github.com/Joseph-Rance/Computing-Soc
 ~~1. add inpainting (using colour spreading from centre method)~~
 
 2. find optimised parameters (using previously made graph)
-3. ~~add~~ fix rotaition finder (via assigning vlaues to lines through centre as functions of either length or something to do with tagnents)
+3. ~~add~~ fix rotation finder (via assigning vlaues to lines through centre as functions of either length or something to do with tagnents)
 
 Also, pratyaksh pointed out:
 *Could we just use the outlier points (i.e. points reachable from core points that are not themselves core points) for [finding the outline of the object]?*
