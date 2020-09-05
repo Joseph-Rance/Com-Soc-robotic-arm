@@ -13,7 +13,7 @@ It then uses unsupervised learning (DBSCAN) to locate the centres of objects in 
 
 <img src="https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/classified%20images/3/output.png?raw=true" alt="output image" width="200"/>
 
-*Note: The only inputs are the background image and the image with objeects in. No other information is used, including how many objects are in the image*
+*Note: The only inputs are the background image and the image with objects in. No other information is used, including how many objects are in the image*
 
 We are currently working on a rotation finder to work out which rotation the grabber should be in to get the best grip on the objects, although there are still a few bugs with this function.
 
