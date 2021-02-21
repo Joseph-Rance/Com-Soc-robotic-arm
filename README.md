@@ -21,11 +21,15 @@ It then uses unsupervised learning (DBSCAN) to locate the centres of objects in 
 
 We are currently working on a rotation finder to work out which rotation the grabber should be in to get the best grip on the objects, although there are still a few bugs with this function.
 
-## ML team todo:
+## Professional image of the models
+
+![image](https://user-images.githubusercontent.com/56409230/108634365-28d36080-7471-11eb-99cc-b2a505ba4dca.png)
+
+## ML team todo
 
 DONE!
 
-## Engineering team todo:
+## Engineering team todo
 
  - [ ] Finish x arm
  - [ ] Add servo connections
@@ -33,6 +37,6 @@ DONE!
  - [ ] Make wooden supports
  - [ ] Get bearing
 
-## Servo team todo:
+## Servo team todo
 
  - [ ] Make the code interface with the GPIO
