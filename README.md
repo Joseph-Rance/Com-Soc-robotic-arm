@@ -1,29 +1,29 @@
 # Com-Soc-robotic-arm
 Repo for the code for our robotic arm project
 
-Main Com Soc Repo: https://github.com/Joseph-Rance/Computing-Soc
+Main Com Soc Repo: https://github.com/CRGS-Computing-Society/Com-Soc-main
 
 CRGS Com Soc are working alongside Engineering Soc to create a robotic arm that uses Unsupervised object detection algorithms to detect objects below it and then picks them up. This repo holds the majority for the object detection code as well as some code for the engineering team.
 
-### SEE ISSUES FOR INFO
+   ### SEE ISSUES FOR INFO
 
-## What the ML team has done
+   ## What the ML team has done
 
 The programme found at [ml team/rotation finder start.ipynb](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/rotation%20finder%20start.ipynb) first takes in an image like the one below as well as an image of the same scene but without objects on it.
 
-<img src="https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/classified%20images/3/input%20image.jpg?raw=true" alt="input image" width="200"/>
+   <img src="https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/classified%20images/3/input%20image.jpg?raw=true" alt="input image" width="200"/>
 
-It then uses unsupervised learning (DBSCAN) to locate the centres of objects in the image by using a processed version of the rounded difference between the input image and the background. Below shows the predicted centres of objects in the image, marked by red dots.
+   It then uses unsupervised learning (DBSCAN) to locate the centres of objects in the image by using a processed version of the rounded difference between the input image and the background. Below shows the predicted centres of objects in the image, marked by red dots.
 
-<img src="https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/classified%20images/3/output.png?raw=true" alt="output image" width="200"/>
+   <img src="https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/classified%20images/3/output.png?raw=true" alt="output image" width="200"/>
 
 *Note: The only inputs are the background image and the image with objects in. No other information is used, including how many objects are in the image*
 
 We are currently working on a rotation finder to work out which rotation the grabber should be in to get the best grip on the objects, although there are still a few bugs with this function.
 
-## Professional image of the models
+   ## Cad model render
 
-![image](https://user-images.githubusercontent.com/56409230/108634365-28d36080-7471-11eb-99cc-b2a505ba4dca.png)
+![image](https://user-images.githubusercontent.com/56409230/108692556-aab89d80-74f4-11eb-98aa-387e124251ea.png)
 
 ## ML team todo
 
