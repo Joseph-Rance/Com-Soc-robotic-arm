@@ -32,7 +32,7 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 ## Engineering team todo
 
  - [ ] check we have all the components we need in the Tech block
- - [ ] Finish x arm
+ - [X] Finish x arm
  - [ ] Add servo connections
  - [ ] print
  - [ ] Make wooden supports
