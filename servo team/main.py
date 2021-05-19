@@ -28,12 +28,11 @@ threshold_function = lambda image, threshold: np.asarray(
 def dilate(image, radius):
     new_image = np.zeros(image.shape)
     image = np.pad(image, radius)
-    for y in range(2, image.shape[0]-2):
-        for x in range(2, image.shape[1]-2):
-            coords = [[(y+j, x+i) for j in range(-radius, radius+1)]
-                        for i in range(-radius, radius+1)]
+    for y in range(new_image.shape[0]):
+        for x in range(new_image.shape[1]):
+            coords = [[(y+j, x+i) for j in range(-radius, radius+1)] for i in range(-radius, radius+1)]
             total = np.asarray([[image[j] for j in i] for i in coords]).any()
-            new_image[y-radius*2, x-radius*2] = total != 0
+            new_image[y, x] = total != 0
     return new_image
 
 
