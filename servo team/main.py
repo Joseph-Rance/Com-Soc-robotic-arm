@@ -32,7 +32,7 @@ def dilate(image, radius):
         for x in range(new_image.shape[1]):
             coords = [[(y+j, x+i) for j in range(-radius, radius+1)] for i in range(-radius, radius+1)]
             total = np.asarray([[image[j] for j in i] for i in coords]).any()
-            new_image[y, x] = total != 0
+            new_image[y-radius, x-radius] = total != 0
     return new_image
 
 
