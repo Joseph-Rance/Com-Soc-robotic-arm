@@ -24,7 +24,6 @@ downsize = lambda img, sf: np.array(
 threshold_function = lambda image, threshold: np.asarray(
     [[pixel >= threshold for pixel in row] for row in image])
 
-
 def dilate(image, radius):
     new_image = np.zeros(image.shape)
     image = np.pad(image, radius)
@@ -34,7 +33,6 @@ def dilate(image, radius):
             total = np.asarray([[image[j] for j in i] for i in coords]).any()
             new_image[y, x] = total != 0
     return new_image
-
 
 def DBSCAN(image, radius, core_threshold):
 
@@ -151,7 +149,7 @@ def get_rotations(image, centres, centre_idx=0, debug=False):
 
     if debug:
         return [check_line_length(centres[centre_idx], radians(angle), image) for angle in range(0, 180, 2)]
-    return np.argmin(np.asarray([check_line_length(centres[centre_idx], radians(angle), image) for angle in range(0, 180, 2)]))  # only one returned because we only do one rotation per time
+    return 2*np.argmin(np.asarray([check_line_length(centres[centre_idx], radians(angle), image) for angle in range(0, 180, 2)]))  # only one returned because we only do one rotation per time
 
 def move_centres(image, centres):
 
@@ -174,6 +172,27 @@ def move_centres(image, centres):
                 new_centres[i] = (point, distance)
 
     return [i[0] for i in new_centres]
+
+parameters = {"scaling": 8,
+              "filter_radius": 2,
+              "threshold": 30,
+              "dbscan_radius": 4,
+              "dbscan_core_threshold": 10,
+              "dilate_size": 2,
+              "centre_idx": 0}
+
+def detect_objs(img1, img2, parameters):
+
+    img = np.absolute(img1 - img2)
+    img = downsize(img, parameters["scaling"])
+    img = median_filter(img, parameters["filter_radius"])
+    img = threshold_function(img, parameters["threshold"])
+    centres = DBSCAN(img, parameters["dbscan_radius"], parameters["dbscan_core_threshold"])[1]
+    centres = move_centres(img, centres)
+    img = dilate(img, parameters["dilate_size"])
+    angle = get_rotations(img, centres, int(parameters["centre_idx"]))
+
+    return centres, angle, img
 
 class servo_control(object):
 
@@ -289,20 +308,15 @@ class servo_control(object):
 
         return actions
 
-def move_and_check_servos(route):  # TODO
-    pass
+def get_params(args):
 
-if __name__ == "__main__":
-
-    args = argv[1:]  # python main.py scaling=0.1
-
-    parameters = {"scaling": 8,  # TODO
+    parameters = {"scaling": 8,
                   "filter_radius": 2,
-                  "threshold": 40,
-                  "dbscan_radius": 5,
-                  "dbscan_core_threshold": 3,
+                  "threshold": 30,
+                  "dbscan_radius": 4,
+                  "dbscan_core_threshold": 10,
                   "dilate_size": 2,
-                  "centre_idx": 2,
+                  "centre_idx": 0,
                   "photo_location_x": 40,
                   "photo_location_y": 0,
                   "photo_location_z": 20,
@@ -341,18 +355,24 @@ if __name__ == "__main__":
 
         parameters[arg[0]] = float(arg[1])
 
+    return parameters
+
+def limit_rotations(route, min_rotations, max_rotations):
+    for rotation in route:
+        for small, big, angle in zip(min_rotations, max_rotations, rotation):
+            if not small <= angle <= big:
+                raise ValueError(f"rotation out of range: {small} <= {angle} <= {big} == False")
+
+def main():
+
     controller = servo_control((parameters["drop_location_x"], parameters["drop_location_y"], parameters["drop_location_z"]))
 
-    time.sleep(5)
-
     no_objects = 1
-    centre_idx = 0
-
     while no_objects != 0:
 
         print("taking images")
 
-        rotations = controller.get_rotations(parameters["photo_location_x"],
+        rotations = controller.get_rotations(parameters["photo_location_x"],  # move to position to take images
                                              parameters["photo_location_y"],
                                              parameters["photo_location_z"],
                                              0, 0,
@@ -362,28 +382,20 @@ if __name__ == "__main__":
                                              parameters["image_height"],
                                              parameters["grabber_open_angle"],
                                              parameters["grabber_close_angle"])
-        move_and_check_servos([rotations])
+
+        rotations = limit_rotations([rotations])[0]  # put hard limits on rotation amounts
+        move_servos([rotations])  # move servos
 
         img1 = np.zeros((100, 100)) # take images
         img2 = np.zeros((100, 100))
 
         print("searching for objects")
 
-        img = np.absolute(img1 - img2)
-        img = downsize(img, parameters["scaling"])
-        img = median_filter(img, parameters["filter_radius"])
-        img = threshold_function(img, parameters["threshold"])
-        img = dilate(img, parameters["dilate_size"])
-        centres = DBSCAN(img, parameters["dbscan_radius"], parameters["dbscan_core_threshold"])[1]
-        centres = move_centres(img, centres)
+        centres, angle, __ = detect_objs(img1, img2, parameters)
 
         no_objects = len(centres)
         if no_objects == 0:
             break
-
-        print("getting rotation for first object")
-
-        angle = get_rotations(img, centres, int(parameters["centre_idx"]))
 
         print("getting rotations for arm")
 
@@ -400,6 +412,10 @@ if __name__ == "__main__":
 
         print("picking up object")
 
-        move_and_check_servos(route)
+        route = limit_rotations(route)[0]  # put hard limits on rotation amounts
+        move_servos(route)  # move servos
 
     print("Done.")
+
+if __name__ == "__main__":
+    main()
