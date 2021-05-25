@@ -1,7 +1,7 @@
 import numpy as np
 from sys import argv
 import time
-from math import atan, pi, asin, acos, cos, sin, radians
+from math import atan, atan2, pi, asin, acos, cos, sin, radians
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
 
@@ -205,8 +205,14 @@ class servo_control(object):
 
     def calibrate(self):
 
-        def get_calibration_image():  # placeholder function
-            return np.zeros((100, 100))
+        def get_calibration_image():  # placeholder function (TODO)
+            img1 = imread('input background.jpg') # take images
+            if img1.ndim == 3:
+                img1 = img1.mean(axis=2)
+
+            img2 = imread('input image.jpg')
+            if img2.ndim == 3:
+                img2 = img2.mean(axis=2)
 
         image = get_calibration_image()
 
@@ -250,15 +256,15 @@ class servo_control(object):
 
         return offsets, scalings
 
-    def get_rotations(self, x_coord, y_coord, z_coord, w, c, x=40, y=35, a=0.07, image_height=1, open_ang=10, close_ang=30):  # g is grabber servo rotation
+    def get_rotations(self, x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=radians(10), close_ang=radians(30)):  # g is grabber servo rotation
 
         '''
-        theta:    angle at the base for horizontal rotation
+        theta:    angle at the base for horizontal rotation (clockwise from the vertical)
         alpha:    angle at the base for vertical roation
         beta:     angle at the elbow for vertical
         gamma:    angle at the wrist for vertical
         w:        wrist rotation
-        r:        radius
+        r:        radius    
         z_coord:  height of hand
         c:        open(0)/closed(1)
         o:        rotation for finger
@@ -274,19 +280,18 @@ class servo_control(object):
         else:
             o = open_ang
 
-        y = image_height - y
-        r = (x**2 + y**2)**0.5
-        theta = atan(y_coord/x_coord)
+        r = (x_coord**2 + y_coord**2)**0.5
+        theta = pi/2 - atan2(y_coord, x_coord)
 
-        b = (r/100)**2 + (a+z_coord)**2
-        alpha = pi - asin((x**2 - y**2 + b)/(2*x*(b**0.5))) - atan((r/100)/(a+z_coord))
-        beta = acos((x*cos(alpha)-(r/100))/y) - alpha
+        b = r**2 + (a+z_coord)**2
+        alpha = pi - asin((x**2 - y**2 + b)/(2*x*(b**0.5))) - atan((r)/(a+z_coord))
+        beta = acos((x*cos(alpha)-(r))/y) - alpha
 
         gamma = 3*pi/2 - alpha - beta
 
         return (theta, alpha, beta, gamma, w, o)
 
-    def get_route(self, w, x, y, z=0.04, x_len=40, y_len=40, a_len=0.07, img_h=1, open_ang=10, close_ang=30):  # x,y in pixels
+    def get_route(self, w, x, y, z=0.04, x_len=40, y_len=40, a_len=0.07, open_ang=10, close_ang=30):  # x,y in pixels
 
         if z < 0.01:
             raise ValueError("DONT HIT THE TABLE")
@@ -297,7 +302,7 @@ class servo_control(object):
         h = 0.05  # height above object
 
         actions = []
-        args = (x_len, y_len, a_len, img_h, open_ang, close_ang)
+        args = (x_len, y_len, a_len, open_ang, close_ang)
 
         actions.append(self.get_rotations(x, y, z+h, w, 0, *args))  # go above object
         actions.append(self.get_rotations(x, y, z, w, 0, *args))  # go down to object
@@ -317,8 +322,8 @@ def get_params(args):
                   "dbscan_core_threshold": 10,
                   "dilate_size": 2,
                   "centre_idx": 0,
-                  "photo_location_x": 40,
-                  "photo_location_y": 0,
+                  "photo_location_x": 0,
+                  "photo_location_y": 40,
                   "photo_location_z": 20,
                   "pickup_height": 0.04,
                   "image_height": 1,
@@ -358,12 +363,22 @@ def get_params(args):
     return parameters
 
 def limit_rotations(route, min_rotations, max_rotations):
+    numbers = list(range(len(min_rotations)))
     for rotation in route:
-        for small, big, angle in zip(min_rotations, max_rotations, rotation):
+        for small, big, angle, idx in zip(min_rotations, max_rotations, rotation, numbers):
             if not small <= angle <= big:
-                raise ValueError(f"rotation out of range: {small} <= {angle} <= {big} == False")
+                raise ValueError(f"rotation for index {idx} out of range: {small} <= {angle} <= {big} == False")
+
+def move_servos(route):  # (TODO)
+    print("BEEP BOOP")
 
 def main():
+
+    args = argv[1:]  # python main.py scaling=0.1
+    parameters = get_params(args)
+
+    min_rotations = [radians(-45), radians(10), radians(10), radians(90), radians(-180), radians(0)]
+    max_rotations = [radians(45), radians(135), radians(170), radians(170), radians(180), radians(15)]
 
     controller = servo_control((parameters["drop_location_x"], parameters["drop_location_y"], parameters["drop_location_z"]))
 
@@ -379,19 +394,41 @@ def main():
                                              parameters["x_arm_length"],
                                              parameters["y_arm_length"],
                                              parameters["a_arm_length"],
-                                             parameters["image_height"],
-                                             parameters["grabber_open_angle"],
-                                             parameters["grabber_close_angle"])
+                                             radians(parameters["grabber_open_angle"]),
+                                             radians(parameters["grabber_close_angle"]))
 
-        rotations = limit_rotations([rotations])[0]  # put hard limits on rotation amounts
+        print(rotations)
+
+        limit_rotations([rotations], min_rotations, max_rotations)  # put hard limits on rotation amounts
         move_servos([rotations])  # move servos
 
-        img1 = np.zeros((100, 100)) # take images
-        img2 = np.zeros((100, 100))
+        img1 = imread('input background.jpg') # take images (TODO)
+        if img1.ndim == 3:
+            img1 = img1.mean(axis=2)
+
+        img2 = imread('input image.jpg')
+        if img2.ndim == 3:
+            img2 = img2.mean(axis=2)
 
         print("searching for objects")
 
+        start_time = time.perf_counter()
         centres, angle, __ = detect_objs(img1, img2, parameters)
+        print(f"Time elapsed: {round(time.perf_counter() - start_time, 2)}s")
+
+        '''
+        plt.imshow(img2, cmap="gray")
+        plt.plot([centres[parameters["centre_idx"]][1]*parameters["scaling"]-30*cos(radians(angle)),
+                centres[parameters["centre_idx"]][1]*parameters["scaling"]+30*cos(radians(angle))],
+                [centres[parameters["centre_idx"]][0]*parameters["scaling"]-30*sin(radians(angle)),
+                centres[parameters["centre_idx"]][0]*parameters["scaling"]+30*sin(radians(angle))], c="r")
+        for i in range(len(centres)):
+            plt.scatter(centres[i][1]*parameters["scaling"], centres[i][0]*parameters["scaling"], c="g" if i == parameters["centre_idx"] else "r")
+        plt.show()
+        '''
+
+        image_height = len(img1)  # TODO: check this
+        centres = [(x, image_height-y) for x, y in centres]
 
         no_objects = len(centres)
         if no_objects == 0:
@@ -406,13 +443,12 @@ def main():
                                      parameters["x_arm_length"],
                                      parameters["y_arm_length"],
                                      parameters["a_arm_length"],
-                                     parameters["image_height"],
                                      parameters["grabber_open_angle"],
                                      parameters["grabber_close_angle"])
 
         print("picking up object")
 
-        route = limit_rotations(route)[0]  # put hard limits on rotation amounts
+        route = limit_rotations(route, min_rotations, max_rotations)[0]  # put hard limits on rotation amounts
         move_servos(route)  # move servos
 
     print("Done.")
