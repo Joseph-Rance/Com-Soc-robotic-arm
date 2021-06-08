@@ -27,13 +27,13 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 ## ML team todo
 
- - [ ] fix the rotation finder code
+ - [X] fix the rotation finder code
 
 ## Engineering team todo
 
  - [X] check we have all the components we need in the Tech block
- - [ ] Finish x arm
- - [ ] Add servo connections
+ - [X] Finish x arm
+ - [ ] Add servo connections (base remaining)
  - [ ] print
  - [ ] Make wooden supports
  - [ ] Get bearing
