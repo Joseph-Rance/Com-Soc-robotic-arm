@@ -4,6 +4,7 @@ import time
 from math import atan, atan2, pi, asin, acos, cos, sin, radians
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
+from adafruit_servokit import ServoKit
 
 def median_filter(input_image, s):
     new_image = np.zeros((input_image.shape[0], input_image.shape[1]))
@@ -369,8 +370,37 @@ def limit_rotations(route, min_rotations, max_rotations):
             if not small <= angle <= big:
                 raise ValueError(f"rotation for index {idx} out of range: {small} <= {angle} <= {big} == False")
 
-def move_servos(route):  # (TODO)
+def move_servos(route, servos, speed=1):
     print("BEEP BOOP")
+    
+    #'''
+    #servos:
+    #0 -> gripper
+    #1 -> gripper sideways rotate
+    #2 -> gripper up/down rotate
+    #3, 4 -> y arm up/down
+    #5,6,7,8,9,10 -> x arm up/down
+    #11 -> horiz. rotate
+    #'''
+    #for (theta, alpha, beta, gamma, w, o) in route:
+    #    
+    #    '''
+    #    theta:    angle at the base for horizontal rotation (clockwise from the vertical)
+    #    alpha:    angle at the base for vertical roation
+    #    beta:     angle at the elbow for vertical
+    #    gamma:    angle at the wrist for vertical
+    #    w:        wrist rotation
+    #    o:        rotation for finger
+    #    '''
+    #    
+    #    servos[0] = o
+    #    servos[1] = w
+    #    servos[2] = gamma
+    #    servos[3] = servos[4] = beta
+    #    for i in range(5, 11):
+    #        servos[i] = alpha
+    #    servos[11] = theta
+
 
 def main():
 
@@ -381,7 +411,12 @@ def main():
     max_rotations = [radians(45), radians(135), radians(170), radians(170), radians(180), radians(15)]
 
     controller = servo_control((parameters["drop_location_x"], parameters["drop_location_y"], parameters["drop_location_z"]))
-
+    kit = ServoKit(channels=16)
+    servos = kit.servo
+    
+    for servo in servos:
+        servo.actuation_range = 135
+    
     no_objects = 1
     while no_objects != 0:
 
@@ -400,7 +435,7 @@ def main():
         print(rotations)
 
         limit_rotations([rotations], min_rotations, max_rotations)  # put hard limits on rotation amounts
-        move_servos([rotations])  # move servos
+        move_servos([rotations], servos)  # move servos
 
         img1 = imread('input background.jpg') # take images (TODO)
         if img1.ndim == 3:
@@ -449,7 +484,7 @@ def main():
         print("picking up object")
 
         route = limit_rotations(route, min_rotations, max_rotations)[0]  # put hard limits on rotation amounts
-        move_servos(route)  # move servos
+        move_servos(route, servos)  # move servos
 
     print("Done.")
 
