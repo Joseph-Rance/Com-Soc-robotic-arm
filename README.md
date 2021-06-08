@@ -41,3 +41,4 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 ## Servo team todo
 
  - [ ] Make the code interface with the GPIO
+ - [ ] Add offsets to servo default rotations
