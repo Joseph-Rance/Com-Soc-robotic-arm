@@ -23,7 +23,7 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 ## Cad model render
 
-![image](https://user-images.githubusercontent.com/56409230/108692556-aab89d80-74f4-11eb-98aa-387e124251ea.png)
+![arm 2](https://user-images.githubusercontent.com/56409230/121727643-121a4d80-cae4-11eb-938c-e55b782f824b.jpg)
 
 ## ML team todo
 
