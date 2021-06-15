@@ -33,12 +33,14 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
  - [X] check we have all the components we need in the Tech block
  - [X] Finish x arm
- - [ ] Add servo connections (base remaining)
+ - [ ] finish servo base connections on model
  - [ ] print
- - [ ] Make wooden supports
- - [ ] Get bearing
+ - [ ] Make wooden base
+ - [X] Get bearing
 
 ## Servo team todo
 
- - [ ] Make the code interface with the GPIO
+ - [X] Make the code interface with the GPIO
+ - [ ] Add code for getting images from picam
  - [ ] Add offsets to servo default rotations
+ - [ ] DEBUG
