@@ -179,7 +179,7 @@ parameters = {"scaling": 32,
               "dbscan_radius": 4,
               "dbscan_core_threshold": 10,
               "dilate_size": 2,
-              "centre_idx": 1}
+              "centre_idx": 0}
 
 def detect_objs(img1, img2):
 
@@ -216,9 +216,9 @@ print(f"Time elapsed: {round(time.perf_counter() - start_time, 2)}s")
 
 print(f"angle below horizontal on the right: {angle}")
 
-parameters["scaling"] = 1
+#parameters["scaling"] = 1
 
-plt.imshow(img, cmap="gray")
+plt.imshow(img2, cmap="gray")
 plt.plot([centres[parameters["centre_idx"]][1]*parameters["scaling"]-30*cos(radians(angle)),
         centres[parameters["centre_idx"]][1]*parameters["scaling"]+30*cos(radians(angle))],
         [centres[parameters["centre_idx"]][0]*parameters["scaling"]-30*sin(radians(angle)),
