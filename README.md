@@ -23,24 +23,26 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 ## Cad model render
 
-![image](https://user-images.githubusercontent.com/56409230/122041137-8a2c9000-cdd0-11eb-80de-dc97544bcafd.png)
+![image](https://user-images.githubusercontent.com/56409230/123335270-20348900-d53c-11eb-8eee-9fbc30d04f5f.png)
 
-## ML team todo
+# TODO
 
- - [X] fix the rotation finder code
+print:
+ - [ ] new base connector (thu?)
+ - [ ] servo connection extenders (thu?)
+ - [ ] x arm top (wed)
+ - [ ] y arm (tue)
+ - [ ] second gear (wed)
 
-## Engineering team todo
+model:
+ - [ ] servo connection extenders (before thu)
 
- - [X] check we have all the components we need in the Tech block
- - [X] Finish x arm
- - [ ] finish servo base connections on model
- - [ ] print
- - [ ] Make wooden base
- - [X] Get bearing
+code:
+ - [ ] update main code for picam + changes made to other code (0 centre index) (tue)
+ - [ ] debug (06/07, 13/07)
 
-## Servo team todo
-
- - [X] Make the code interface with the GPIO
- - [ ] Add code for getting images from picam
- - [ ] Add offsets to servo default rotations
- - [ ] DEBUG
+engineering:
+ - [ ] clean printed parts (29/06, 06/07)
+ - [ ] make base (06/07)
+ - [ ] assemble (13/07)
+ - [ ] test (13/07)
