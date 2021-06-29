@@ -28,6 +28,7 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 # TODO
 
 print:
+ - [ ] gear top
  - [ ] new base connector (thu?)
  - [ ] servo connection extenders (thu?)
  - [ ] x arm top (wed)
