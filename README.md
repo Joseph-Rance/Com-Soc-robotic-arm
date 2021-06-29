@@ -27,6 +27,8 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 # TODO
 
+**REMINDER FOR JOE: BRING TINY SCREWDRIVER**
+
 print:
  - [ ] gear top
  - [ ] new base connector (thu?)
