@@ -31,11 +31,12 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 print:
  - [ ] gear top
- - [ ] new base connector (thu?)
- - [ ] servo connection extenders (thu?)
- - [ ] x arm top (wed)
- - [ ] y arm (tue)
- - [ ] second gear (wed)
+ - [ ] new base connector
+ - [ ] servo connection extenders  (prining)
+ - [ ] x arm top
+ - [X] y arm top
+ - [ ] y arm bottom
+ - [X] second gear
 
 model:
  - [ ] servo connection extenders (before thu)
