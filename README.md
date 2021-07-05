@@ -5,8 +5,6 @@ Main Com Soc Repo: https://github.com/CRGS-Computing-Society/Com-Soc-main
 
 CRGS Com Soc are working alongside Engineering Soc to create a robotic arm that uses Unsupervised object detection algorithms to detect objects below it and then picks them up. The CAD models and arm code can be found in this repo.
 
-### SEE ISSUES FOR ENGINEERING NOTES
-
 ## What the ML team has done
 
 The programme found at [ml team/rotation finder start.ipynb](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/ml%20team/Rotation%20Finder%20Final%20%5B%2BDBSCAN%5D.ipynb) first takes in an image like the one below as well as an image of the same scene but without objects on it.
@@ -26,8 +24,6 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 ![image](https://user-images.githubusercontent.com/56409230/123335270-20348900-d53c-11eb-8eee-9fbc30d04f5f.png)
 
 # TODO
-
-**REMINDER FOR JOE: BRING TINY SCREWDRIVER**
 
 print:
  - [X] gear top
