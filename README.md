@@ -30,23 +30,20 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 **REMINDER FOR JOE: BRING TINY SCREWDRIVER**
 
 print:
- - [ ] gear top
- - [ ] new base connector
- - [ ] servo connection extenders  (prining)
+ - [X] gear top
+ - [ ] new base connector (2 parts)
+ - [ ] servo connection extenders
  - [ ] x arm top
  - [X] y arm top
- - [ ] y arm bottom
+ - [X] y arm bottom
  - [X] second gear
 
-model:
- - [ ] servo connection extenders (before thu)
-
 code:
- - [ ] update main code for picam + changes made to other code (0 centre index) (tue)
- - [ ] debug (06/07, 13/07)
+ - [X] update main code for picam + changes made to other code (0 centre index) (tue)
+ - [ ] debug + finish todos
 
 engineering:
- - [ ] clean printed parts (29/06, 06/07)
- - [ ] make base (06/07)
- - [ ] assemble (13/07)
- - [ ] test (13/07)
+ - [ ] clean printed parts
+ - [X] make base
+ - [ ] assemble
+ - [ ] test
