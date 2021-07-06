@@ -25,21 +25,10 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 # TODO
 
-print:
- - [X] gear top
- - [ ] new base connector (2 parts)
- - [ ] servo connection extenders
- - [ ] x arm top
- - [X] y arm top
- - [X] y arm bottom
- - [X] second gear
-
-code:
- - [X] update main code for picam + changes made to other code (0 centre index) (tue)
- - [ ] debug + finish todos
-
-engineering:
- - [ ] clean printed parts
- - [X] make base
+ - [ ] print new base connector (printing)
+ - [ ] print x arm top (printing)
+ - [ ] debug + finish comments wth "todo" on them
+ - [ ] clean printed parts + enlarge servo holes
+ - [ ] glue parts together
  - [ ] assemble
  - [ ] test
