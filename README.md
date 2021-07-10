@@ -25,8 +25,8 @@ The algorithm also identifies the best angle to rotate the hand to get hte best 
 
 # TODO
 
- - [ ] print new base connector (printing)
- - [ ] print x arm top (printing)
+ - [X] print new base connector ~~(printing)~~
+ - [X] print x arm top ~~(printing)~~
  - [ ] debug + finish comments wth "todo" on them
  - [ ] clean printed parts + enlarge servo holes
  - [ ] glue parts together
