@@ -199,14 +199,11 @@ class servo_control(object):
 
     def calibrate(self):  # TODO: check
 
-        def get_calibration_image():  # placeholder function (TODO)
-            img1 = imread('input background.jpg') # take images
-            if img1.ndim == 3:
-                img1 = img1.mean(axis=2)
-
-            img2 = imread('input image.jpg')
-            if img2.ndim == 3:
-                img2 = img2.mean(axis=2)
+        def get_calibration_image():
+            img = imread('calibration image.jpg')
+            if img.ndim == 3:
+                img = img.mean(axis=2)
+            return img
 
         image = get_calibration_image()
 
@@ -234,7 +231,7 @@ class servo_control(object):
         except:
             raise ValueError("division by zero due to points being aligned in x or y. Try again with different image x,y values")
         mean_scaling = (scalingx + scalingy) / 2
-        scalings = (mean_scaling, mean_scaling)
+        scalings = (mean_scaling, mean_scaling)  # TODO: why are we combining scalings in different directions?
 
         offsetx_1 = real1[0] - (image1[0] * scalings[0])
         offsetx_2 = real2[0] - (image2[0] * scalings[0])
@@ -351,11 +348,15 @@ def get_params(args):
 
         parameters[arg[0]] = float(arg[1])
 
-    return parameters, [0, 0, 0, -90, 0, 0]  # TODO: add offset to wrist rotation (so that it works with angle from obj det)?
+    return parameters, [0, 0, 0, -90, 0, 0]  # TODO: make offsets + do we need per servo offsets for manual adjustment?
 
 def move_servos(route, servos, offsets, speed=1):
 
     route = [[degrees(i) for i in j] for j in route]
+
+    for movement in route:
+        movement[-1] != 0.75  # account for gearing in base; TODO: do we need to do *-0.75?
+
     route = [[x+y for x,y in zip(j, offsets)] for j in route]
     
     '''
@@ -382,10 +383,17 @@ def move_servos(route, servos, offsets, speed=1):
         servos[1].angle = w
         servos[2].angle = gamma
         servos[3].angle = servos[4].angle = beta
-        for i in range(5, 11):
-            servos[i].angle = alpha
+
+        # TODO: check this is the right way around
+        servos[5].angle = servos[6].angle = servos[7].angle = 145 - alpha  # 145 is max rotation
+        servos[8].angle = servos[9].angle = servos[10].angle = alpha
+
         servos[11].angle = theta
 
+        time.sleep(0.5)
+        for i in range(12):  # turn off servos when not moving to avoid jitter
+            kit.servo[i].angle = None
+        time.sleep(0.3)  # ensure servos have finished moving before next move
 
 def main():
 
@@ -397,7 +405,7 @@ def main():
     servos = kit.servo
     
     for i in range(16):
-            servos[i].actuation_range = 180
+            servos[i].actuation_range = 145
 
     camera = p()
 
@@ -424,6 +432,8 @@ def main():
                                              radians(parameters["grabber_close_angle"]))
 
         move_servos([rotations], servos, offsets)  # move servos
+
+        time.sleep(10)  # TODO: temporary so the arm doesnt shake itself apart on first attempt
 
         camera.capture("/home/pi/Desktop/input image.jpg")
         img2 = imread('input image.jpg')

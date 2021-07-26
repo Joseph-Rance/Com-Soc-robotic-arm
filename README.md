@@ -24,7 +24,7 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 # TODO
 
 - [ ] finish TODOs in [combined/main.py](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/combined/main.py)
-- [ ] fix issues with servo power supply (add new cables?)
-- [ ] test code with each set of servos + update code to reduce jitter and allow for gearing
+- [x] fix issues with servo power supply (add new cables?)
+- [ ] test code with each set of servos ~~+ update code to reduce jitter and allow for gearing~~
 - [ ] add servos in at the correct orientation
-- [ ] test arm
+- [ ] test arm as whole + fix any problems
