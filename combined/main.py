@@ -385,8 +385,8 @@ def move_servos(route, servos, offsets, speed=1):
         servos[3].angle = servos[4].angle = beta
 
         # TODO: check this is the right way around
-        servos[5].angle = servos[6].angle = servos[7].angle = 145 - alpha  # 145 is max rotation
-        servos[8].angle = servos[9].angle = servos[10].angle = alpha
+        servos[5].angle = servos[6].angle = servos[7].angle = alpha
+        servos[8].angle = servos[9].angle = servos[10].angle = 145 - alpha  # 145 is max rotation
 
         servos[11].angle = theta
 
