@@ -348,16 +348,11 @@ def get_params(args):
 
         parameters[arg[0]] = float(arg[1])
 
-    return parameters, [0, 0, 0, -90, 0, 0]  # TODO: make offsets + do we need per servo offsets for manual adjustment?
+    return parameters
 
-def move_servos(route, servos, offsets, speed=1):
+def move_servos(route, servos, speed=1):
 
     route = [[degrees(i) for i in j] for j in route]
-
-    for movement in route:
-        movement[-1] != 0.75  # account for gearing in base; TODO: do we need to do *-0.75?
-
-    route = [[x+y for x,y in zip(j, offsets)] for j in route]
     
     '''
     servos:
@@ -380,14 +375,17 @@ def move_servos(route, servos, offsets, speed=1):
         '''
         
         servos[0].angle = o
-        servos[1].angle = w
+        servos[1].angle = 90 - w
         servos[2].angle = gamma
-        servos[3].angle = servos[4].angle = beta
+        servos[3].angle = beta
+        servos[4].angle = 145 - beta
 
-        servos[5].angle = servos[6].angle = servos[7].angle = alpha
-        servos[8].angle = servos[9].angle = servos[10].angle = 145 - alpha  # 145 is max rotation
+        servos[5].angle = servos[6].angle = 145 - alpha - 3  # 145 is max rotation
+        servos[7].angle = 145 - alpha
+        servos[8].angle = servos[10].angle = alpha + 5
+        servos[9].angle = alpha + 12
 
-        servos[11].angle = theta
+        servos[11].angle = theta * -0.75 + 22
 
         time.sleep(0.5)
         for i in range(12):  # turn off servos when not moving to avoid jitter
@@ -397,7 +395,7 @@ def move_servos(route, servos, offsets, speed=1):
 def main():
 
     args = argv[1:]  # python main.py scaling=0.1
-    parameters, offsets = get_params(args)
+    parameters = get_params(args)
 
     controller = servo_control((parameters["drop_location_x"], parameters["drop_location_y"], parameters["drop_location_z"]))
     kit = ServoKit(channels=16)
@@ -430,7 +428,7 @@ def main():
                                              radians(parameters["grabber_open_angle"]),
                                              radians(parameters["grabber_close_angle"]))
 
-        move_servos([rotations], servos, offsets)  # move servos
+        move_servos([rotations], servos)  # move servos
 
         time.sleep(10)  # TODO: temporary so the arm doesnt shake itself apart on first attempt
 
@@ -477,7 +475,7 @@ def main():
 
         print("picking up object")
 
-        move_servos(route, servos, offsets)
+        move_servos(route, servos)
 
     camera.close()
     print("Done.")
