@@ -1,38 +1,8 @@
 import time
-from math import atan, atan2, pi, asin, acos, cos, sin, radians, degrees
-from adafruit_servokit import ServoKit
+from math import atan, atan2, pi, asin, acos, cos, sin, radians
+#from adafruit_servokit import ServoKit
 
-def move_servos(route, servos, speed=1):
-    
-    '''
-    servos:
-    0 -> gripper
-    1 -> gripper sideways rotate
-    2 -> gripper up/down rotate
-    3, 4 -> y arm up/down
-    5,6,7,8,9,10 -> x arm up/down
-    11 -> horiz. rotate
-    '''
-    for (theta, alpha, beta, gamma, w, o) in route:
-        
-        '''
-        theta:    angle at the base for horizontal rotation (clockwise from the vertical)
-        alpha:    angle at the base for vertical roation
-        beta:     angle at the elbow for vertical
-        gamma:    angle at the wrist for vertical
-        w:        wrist rotation
-        o:        rotation for finger
-        '''
-        
-        servos[0].angle = o
-        servos[1].angle = w
-        servos[2].angle = gamma
-        servos[3].angle = servos[4].angle = beta
-        for i in range(5, 11):
-            servos[i].angle = alpha
-        servos[11].angle = theta
-
-def get_rotations(x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=radians(10), close_ang=radians(30)):
+def get_rotations(x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=radians(0), close_ang=radians(25)):
 
     '''
     theta:    angle at the base for horizontal rotation (clockwise from the vertical)
@@ -67,21 +37,61 @@ def get_rotations(x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=rad
 
     return theta, alpha, beta, gamma, w, o
 
+def move_servos(route, servos, offsets, speed=1):
 
-kit = ServoKit(channels=16)
-servos = kit.servo
+    route = [[degrees(i) for i in j] for j in route]
+    
+    '''
+    servos:
+    0 -> gripper
+    1 -> gripper sideways rotate
+    2 -> gripper up/down rotate
+    3, 4 -> y arm up/down
+    5,6,7,8,9,10 -> x arm up/down
+    11 -> horiz. rotate
+    '''
+    for (theta, alpha, beta, gamma, w, o) in route:
+        
+        '''
+        theta:    angle at the base for horizontal rotation (clockwise from the vertical)
+        alpha:    angle at the base for vertical roation
+        beta:     angle at the elbow for vertical
+        gamma:    angle at the wrist for vertical
+        w:        wrist rotation
+        o:        rotation for finger
+        '''
+        
+        servos[0].angle = o
+        servos[1].angle = 90 - w
+        servos[2].angle = gamma
+        servos[3].angle = beta
+        servos[4].angle = 145 - beta
 
-for i in range(16):
-    servos[i].actuation_range = 180 
+        servos[5].angle = servos[6].angle = 145 - alpha - 3  # 145 is max rotation
+        servos[7].angle = 145 - alpha
+        servos[8].angle = servos[10].angle = alpha + 5
+        servos[9].angle = alpha + 12
 
-offsets = [0, 0, 0, -90, 0, 0] # add offsets to rotations
+        servos[11].angle = theta * -0.75 + 22
 
-while True:
+        time.sleep(0.5)
+        for i in range(12):  # turn off servos when not moving to avoid jitter
+            kit.servo[i].angle = None
+        time.sleep(0.3)  # ensure servos have finished moving before next move
 
-    coords = tuple(int(i) for i in input("(x, y, z, w, c) = ").split(", "))  # w = wrist rotation, c = open(0)/closed(1)
-    assert len(coords) == 5
-    route = [get_rotations(*coords)]
-    route = [[degrees(i) for i in route[0]]]
-    route = [[x+y for x,y in zip(route[0], offsets)]]
-    print(route[0])
-    move_servos(route, servos)
+def main():
+
+    kit = ServoKit(channels=16)
+    servos = kit.servo
+    
+    for i in range(16):
+        servos[i].actuation_range = 145
+
+    rotations = get_rotations(0, 42, 10, 0, 0)
+    print(rotations)
+    move_servos([rotations], servos, offsets)
+
+    print("Done.")
+
+if __name__ == "__main__":
+    main()
