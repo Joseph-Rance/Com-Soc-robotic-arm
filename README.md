@@ -28,3 +28,18 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 - [ ] test code with each set of servos ~~+ update code to reduce jitter and allow for gearing~~
 - [ ] add servos in at the correct orientation
 - [ ] test arm as whole + fix any problems
+
+# servo offsets
+
+0 -> 0 to 25
+1 -> 90 (inv)
+2 -> 0
+3 -> 0
+4 -> 0 (inv)
+5 -> -3
+6 -> -3
+7 -> 0
+8 -> 5 (inv)
+9 -> 12 (inv)
+10 -> 5 (inv)
+11 -> 22 (inv, gear)
