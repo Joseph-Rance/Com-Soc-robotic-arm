@@ -25,12 +25,13 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 
 - [ ] finish TODOs in [combined/main.py](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/combined/main.py)
 - [x] fix issues with servo power supply (add new cables?)
-- [ ] test code with each set of servos ~~+ update code to reduce jitter and allow for gearing~~
-- [ ] add servos in at the correct orientation
-- [ ] test arm as whole + fix any problems
+- [X] test code with each set of servos ~~+ update code to reduce jitter and allow for gearing~~
+- [X] add servos in at the correct orientation
+- [ ] test arm as whole + fix any problems (inc. fixing horizontal rotate servo, up/down gripper, and checking main.py is up to date with move_arm.py)
 
 # servo offsets
 
+```
 0 -> 0 to 25
 1 -> 90 (inv)
 2 -> 0
@@ -43,3 +44,4 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 9 -> 12 (inv)
 10 -> 5 (inv)
 11 -> 22 (inv, gear)
+```
