@@ -197,7 +197,7 @@ class servo_control(object):
             self.calibrate()
         self.drop_pos = drop_pos
 
-    def calibrate(self):  # TODO: check
+    def calibrate(self):
 
         def get_calibration_image():
             img = imread('calibration image.jpg')
@@ -217,7 +217,7 @@ class servo_control(object):
 
             plt.imshow(image)
             plt.scatter([int(a), int(c)], [int(b), int(d)])
-            plt.show()
+            plt.savefig("image.jpg")
 
             exit = input("Would you like to change these values? (y/n) ") != "y"
 
@@ -306,7 +306,6 @@ class servo_control(object):
 
 def get_params(args):
 
-    # TODO: question marks below
     parameters = {"scaling": 32,
                   "filter_radius": 2,
                   "threshold": 30,
@@ -315,18 +314,17 @@ def get_params(args):
                   "dilate_size": 2,
                   "centre_idx": 0,
                   "photo_location_x": 0,
-                  "photo_location_y": 40, # ?
-                  "photo_location_z": 20, # ?
-                  "pickup_height": 0.04, # ?
-                  "image_height": 1, # ?
+                  "photo_location_y": 35,
+                  "photo_location_z": 20,
+                  "pickup_height": 0.1,
                   "x_arm_length": 40,
                   "y_arm_length": 35,
-                  "a_arm_length": 0.07, # ?
-                  "drop_location_x": 0, # ?
-                  "drop_location_y": 0, # ?
-                  "drop_location_z": 20, # ?
-                  "grabber_open_angle": 10, # ?
-                  "grabber_close_angle": 30} # ?
+                  "a_arm_length": 0.07,
+                  "drop_location_x": -20,
+                  "drop_location_y": 20,
+                  "drop_location_z": 20,
+                  "grabber_open_angle": 0,
+                  "grabber_close_angle": 25}
 
     exit = False
     try:
@@ -394,6 +392,9 @@ def main():
     args = argv[1:]  # python main.py scaling=0.1
     parameters = get_params(args)
 
+    camera = p()
+    camera.capture("/home/pi/Desktop/calibration image.jpg")   # TODO: ROTATE ALL IMAGES
+
     controller = servo_control((parameters["drop_location_x"], parameters["drop_location_y"], parameters["drop_location_z"]))
     kit = ServoKit(channels=16)
     servos = kit.servo
@@ -401,8 +402,7 @@ def main():
     for i in range(16):
             servos[i].actuation_range = 145
 
-    camera = p()
-
+    
     camera.capture("/home/pi/Desktop/input background.jpg")
     img1 = imread('input background.jpg')
     if img1.ndim == 3:
@@ -483,3 +483,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
