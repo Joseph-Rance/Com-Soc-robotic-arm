@@ -1,6 +1,6 @@
 import time
-from math import atan, atan2, pi, asin, acos, cos, sin, radians
-#from adafruit_servokit import ServoKit
+from math import atan, atan2, pi, asin, acos, cos, sin, radians, degrees
+from adafruit_servokit import ServoKit
 
 def get_rotations(x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=radians(0), close_ang=radians(25)):
 
@@ -37,7 +37,7 @@ def get_rotations(x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=rad
 
     return theta, alpha, beta, gamma, w, o
 
-def move_servos(route, servos, offsets, speed=1):
+def move_servos(route, servos, speed=1):
 
     route = [[degrees(i) for i in j] for j in route]
     
@@ -63,7 +63,7 @@ def move_servos(route, servos, offsets, speed=1):
         
         servos[0].angle = o
         servos[1].angle = 90 - w
-        servos[2].angle = gamma
+        servos[2].angle = 180 - gamma
         servos[3].angle = beta
         servos[4].angle = 145 - beta
 
@@ -74,9 +74,9 @@ def move_servos(route, servos, offsets, speed=1):
 
         servos[11].angle = theta * -0.75 + 22
 
-        time.sleep(0.5)
-        for i in range(12):  # turn off servos when not moving to avoid jitter
-            kit.servo[i].angle = None
+        #time.sleep(0.5)
+        #for i in range(12):  # turn off servos when not moving to avoid jitter
+        #    servos[i].angle = None
         time.sleep(0.3)  # ensure servos have finished moving before next move
 
 def main():
@@ -87,11 +87,26 @@ def main():
     for i in range(16):
         servos[i].actuation_range = 145
 
-    rotations = get_rotations(0, 42, 10, 0, 0)
-    print(rotations)
-    move_servos([rotations], servos, offsets)
+    route = [
+        [0, 45, 10, 0, 0],
+        [10, 34, 20, 0, 0],
+        [0, 45, 10, pi/2, 1],
+        [0, 45, 10, 0, 0]
+    ]
+
+    route = [[0, 35, 30, 0, 0]]
+
+    for coords in route:
+        rotations = get_rotations(*coords)
+        print([degrees(i) for i in rotations])
+        move_servos([rotations], servos)
+        time.sleep(1)
+
+    for i in range(12):
+        servos[i].angle = None
 
     print("Done.")
 
 if __name__ == "__main__":
     main()
+
