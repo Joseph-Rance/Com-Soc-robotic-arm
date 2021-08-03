@@ -45,3 +45,5 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 10 -> 5 (inv)
 11 -> 22 (inv, gear)
 ```
+
+**Calibration dots are (-10, 30), (10, 30) cm**
