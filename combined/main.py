@@ -247,7 +247,7 @@ class servo_control(object):
 
         return offsets, scalings
 
-    def get_rotations(self, x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=radians(10), close_ang=radians(30)):
+    def get_rotations(self, x_coord, y_coord, z_coord, w, c, x=40, y=35, a=7, open_ang=radians(0), close_ang=radians(25)):
 
         '''
         theta:    angle at the base for horizontal rotation (clockwise from the vertical)
@@ -376,7 +376,7 @@ def move_servos(route, servos, speed=1):
         
         servos[0].angle = o
         servos[1].angle = 90 - w
-        servos[2].angle = gamma
+        servos[2].angle = 180 - gamma
         servos[3].angle = beta
         servos[4].angle = 145 - beta
 
@@ -387,10 +387,7 @@ def move_servos(route, servos, speed=1):
 
         servos[11].angle = theta * -0.75 + 22
 
-        time.sleep(0.5)
-        for i in range(12):  # turn off servos when not moving to avoid jitter
-            kit.servo[i].angle = None
-        time.sleep(0.3)  # ensure servos have finished moving before next move
+        time.sleep(1.5)  # ensure servos have finished moving before next move
 
 def main():
 
@@ -428,9 +425,10 @@ def main():
                                              radians(parameters["grabber_open_angle"]),
                                              radians(parameters["grabber_close_angle"]))
 
-        move_servos([rotations], servos)  # move servos
-
-        time.sleep(10)  # TODO: temporary so the arm doesnt shake itself apart on first attempt
+        move_servos([rotations], servos)
+        
+        for i in range(12):  # reduce jitter when stationary
+            servos[i].angle = None
 
         camera.capture("/home/pi/Desktop/input image.jpg")
         img2 = imread('input image.jpg')
@@ -476,6 +474,9 @@ def main():
         print("picking up object")
 
         move_servos(route, servos)
+        
+        for i in range(12):  # reduce jitter when stationary
+            servos[i].angle = None
 
     camera.close()
     print("Done.")
