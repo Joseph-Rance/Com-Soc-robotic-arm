@@ -208,12 +208,12 @@ class servo_control(object):
         image = get_calibration_image()
 
         a, b, c, d = input("what are the real positions in m of the dots in the image? (in format: 'x, y, x, y') ").split(", ")
-        real1, real2 = (float(a), float(b)), (float(c), float(d))
+        real_1, real_2 = (float(a), float(b)), (float(c), float(d))
 
         exit = False
         while not exit:
             a, b, c, d = input("What are the positions in pixels of the dots in the image? (in format: 'x, y, x, y') ").split(", ")
-            image1, image2 = (float(a), float(b)), (float(c), float(d))
+            image_1, image_2 = (float(a), float(b)), (float(c), float(d))
 
             plt.imshow(image)
             plt.scatter([int(a), int(c)], [int(b), int(d)])
@@ -223,25 +223,50 @@ class servo_control(object):
 
         plt.imshow(image)
         plt.scatter([int(a), int(c)], [int(b), int(d)])
-        plt.show()
+        plt.savefig("image.jpg")
+        
+        '''
+        TODO: test this code
+        
+        x_i*s_x + o_x = x_r
+        image_1[0] * self.scalings[0] + self.offsets[0] = real_1[0]
+        image_2[0] * self.scalings[0] + self.offsets[0] = real_2[0]
+        
+        y_i*s_y + o_y = y_r
+        image_1[1] * self.scalings[1] + self.offsets[1] = real_1[1]
+        image_2[1] * self.scalings[1] + self.offsets[1] = real_2[1]
+        
+        so:
+        image_1[0] * self.scalings[0] + self.offsets[0] - image_2[0] * self.scalings[0] - self.offsets[0] = real_1[0] - real_2[0]
+        image_1[0] * self.scalings[0] - image_2[0] * self.scalings[0] = real_1[0] - real_2[0]
+        self.scalings[0] = (real_1[0] - real_2[0]) / (image_1[0] - image_2[0])
+        so long as image_1[0] != image_2[0]
+        
+        and self.offsets[0] = real_2[0] - image_2[0] * self.scalings[0]
+        
+        similarly:
+        self.scalings[1] = (real_1[1] - real_2[1]) / (image_1[1] - image_2[1])
+        self.offsets[1] = real_2[1] - image_2[1] * self.scalings[1]
+        
+        '''
     
         try:
-            scalingx = (real1[0] - real2[0]) / (image1[0] - image2[0])
-            scalingy = (real1[1] - real2[1]) / (image1[1] - image2[1])
+            scaling_x = (real_1[0] - real_2[0]) / (image_1[0] - image_2[0])
+            scaling_y = (real_1[1] - real_2[1]) / (image_1[1] - image_2[1])
         except:
             raise ValueError("division by zero due to points being aligned in x or y. Try again with different image x,y values")
-        mean_scaling = (scalingx + scalingy) / 2
-        scalings = (mean_scaling, mean_scaling)  # TODO: why are we combining scalings in different directions?
 
-        offsetx_1 = real1[0] - (image1[0] * scalings[0])
-        offsetx_2 = real2[0] - (image2[0] * scalings[0])
-        mean_offsetx = (offsetx_1 + offsetx_2) / 2
+        scalings = (scaling_x, scaling_y)
 
-        offsety_1 = real1[1] - (image1[1] * scalings[1])
-        offsety_2 = real2[1] - (image2[1] * scalings[1])
-        mean_offsety = (offsety_1 + offsety_2) / 2
+        offset_x_1 = real_1[0] - image_1[0] * scalings[0]
+        offset_x_2 = real_2[0] - image_2[0] * scalings[0]
+        assert offset_x_1 == offset_x_2
 
-        offsets = (mean_offsetx, mean_offsety)
+        offset_y_1 = real_1[1] - image_1[1] * scalings[1]
+        offset_y_2 = real_2[1] - image_2[1] * scalings[1]
+        assert offset_y_1 == offset_y_2
+
+        offsets = (offset_x_1, offset_y_1)
     
         self.scalings, self.offsets = scalings, offsets
 
@@ -402,7 +427,6 @@ def main():
     for i in range(16):
             servos[i].actuation_range = 145
 
-    
     camera.capture("/home/pi/Desktop/input background.jpg")
     img1 = imread('input background.jpg')
     if img1.ndim == 3:
@@ -454,6 +478,10 @@ def main():
 
         image_height = len(img1)
         centres = [(x, image_height-y) for x, y in centres]
+
+        angle -= pi/2  # convert angle to be zeroed for arm
+        while angle < -pi/2:
+            angle += pi
 
         no_objects = len(centres)
         if no_objects == 0:
