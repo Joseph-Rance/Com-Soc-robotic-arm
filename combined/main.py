@@ -418,7 +418,8 @@ def main():
     parameters = get_params(args)
 
     camera = p()
-    camera.capture("/home/pi/Desktop/calibration image.jpg")   # TODO: ROTATE ALL IMAGES
+    camera.rotation = 90  # TODO: make sure this is correct so that "down" is towards base of arm
+    camera.capture("/home/pi/Desktop/calibration image.jpg")
 
     controller = servo_control((parameters["drop_location_x"], parameters["drop_location_y"], parameters["drop_location_z"]))
     kit = ServoKit(channels=16)
