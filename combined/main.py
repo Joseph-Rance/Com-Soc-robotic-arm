@@ -1,7 +1,7 @@
 import numpy as np
 from sys import argv
 import time
-from math import atan, atan2, pi, asin, acos, cos, sin, radians
+from math import atan, atan2, pi, asin, acos, cos, sin, radians, degrees
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
 from adafruit_servokit import ServoKit
@@ -28,7 +28,7 @@ threshold_function = lambda image, threshold: np.asarray(
 
 def dilate(image, radius):
     new_image = np.zeros(image.shape)
-    image = np.pad(image, radius)
+    image = np.pad(image, radius, "constant")
     for y in range(new_image.shape[0]):
         for x in range(new_image.shape[1]):
             coords = [[(y+j+radius, x+i+radius) for j in range(-radius, radius+1)] for i in range(-radius, radius+1)]
@@ -114,7 +114,7 @@ def DBSCAN(image, radius, core_threshold):
 
     return points, centres, loss
 
-def get_rotations(image, centres, centre_idx=0, debug=False):
+def get_gripper_angle(image, centres, centre_idx=0, debug=False):
 
     def check_line_length(centre, angle, image):  # angle is from line to right
 
@@ -184,7 +184,10 @@ def detect_objs(img1, img2, parameters):
     centres = DBSCAN(img, parameters["dbscan_radius"], parameters["dbscan_core_threshold"])[1]
     centres = move_centres(img, centres)
     img = dilate(img, parameters["dilate_size"])
-    angle = get_rotations(img, centres, int(parameters["centre_idx"]))
+    try:
+        angle = get_gripper_angle(img, centres, int(parameters["centre_idx"]))
+    except IndexError:
+        raise RuntimeError("objects not found")
 
     return centres, angle, img
 
@@ -213,7 +216,7 @@ class servo_control(object):
         exit = False
         while not exit:
             a, b, c, d = input("What are the positions in pixels of the dots in the image? (in format: 'x, y, x, y') ").split(", ")
-            image_1, image_2 = (float(a), float(b)), (float(c), float(d))
+            image_1, image_2 = (float(a), len(image)-float(b)), (float(c), len(image)-float(d))
 
             plt.imshow(image)
             plt.scatter([int(a), int(c)], [int(b), int(d)])
@@ -225,9 +228,7 @@ class servo_control(object):
         plt.scatter([int(a), int(c)], [int(b), int(d)])
         plt.savefig("image.jpg")
         
-        '''
-        TODO: test this code
-        
+        '''        
         x_i*s_x + o_x = x_r
         image_1[0] * self.scalings[0] + self.offsets[0] = real_1[0]
         image_2[0] * self.scalings[0] + self.offsets[0] = real_2[0]
@@ -307,25 +308,28 @@ class servo_control(object):
 
         return theta, alpha, beta, gamma, w, o
 
-    def get_route(self, w, x, y, z=0.04, x_len=40, y_len=40, a_len=0.07, open_ang=10, close_ang=30):  # x,y in pixels
+    def get_route(self, w, x, y, z=0.1, x_len=40, y_len=40, a_len=0.07, open_ang=10, close_ang=30):  # x,y in pixels
 
         if z < 0.01:
             raise ValueError("DONT HIT THE TABLE")
 
         x = self.offsets[0] + self.scalings[0]*x
         y = self.offsets[1] + self.scalings[1]*y
+        
+        print(f"picking up object at (x, y, z)={(x, y, z)}")
 
         h = 0.05  # height above object
-
-        actions = []
+                
         args = (x_len, y_len, a_len, open_ang, close_ang)
 
-        actions.append(self.get_rotations(x, y, z+h, w, 0, *args))  # go above object
-        actions.append(self.get_rotations(x, y, z, w, 0, *args))  # go down to object
-        actions.append(self.get_rotations(x, y, z, w, 1, *args))  # grab object
-        actions.append(self.get_rotations(x, y, z+h, w, 1, *args))  # go up from table
-        actions.append(self.get_rotations(self.drop_pos[0], self.drop_pos[1], z+h, 0, 1, *args))  # go to drop position
-        actions.append(self.get_rotations(self.drop_pos[0], self.drop_pos[1], z+h, 0, 0, *args))  # drop object
+        actions = [
+            self.get_rotations(x, y, z+h, w, 0, *args),  # go above object
+            self.get_rotations(x, y, z, w, 0, *args),  # go down to object
+            self.get_rotations(x, y, z, w, 1, *args),  # grab object
+            self.get_rotations(x, y, z+h, w, 1, *args),  # go up from table
+            self.get_rotations(self.drop_pos[0], self.drop_pos[1], z+h, 0, 1, *args),  # go to drop position
+            self.get_rotations(self.drop_pos[0], self.drop_pos[1], z+h, 0, 0, *args)  # drop object
+        ]
 
         return actions
 
@@ -339,8 +343,8 @@ def get_params(args):
                   "dilate_size": 2,
                   "centre_idx": 0,
                   "photo_location_x": 0,
-                  "photo_location_y": 35,
-                  "photo_location_z": 20,
+                  "photo_location_y": 30,
+                  "photo_location_z": 35,
                   "pickup_height": 0.1,
                   "x_arm_length": 40,
                   "y_arm_length": 35,
@@ -384,7 +388,7 @@ def move_servos(route, servos, speed=1):
     2 -> gripper up/down rotate
     3, 4 -> y arm up/down
     5,6,7,8,9,10 -> x arm up/down
-    11 -> horiz. rotate
+    11 -> horiz. rotcentresate
     '''
     for (theta, alpha, beta, gamma, w, o) in route:
         
@@ -408,7 +412,7 @@ def move_servos(route, servos, speed=1):
         servos[8].angle = servos[10].angle = alpha + 5
         servos[9].angle = alpha + 12
 
-        servos[11].angle = theta * -0.75 + 22
+        servos[11].angle = theta * -0.75 + 27
 
         time.sleep(1.5)  # ensure servos have finished moving before next move
 
@@ -450,7 +454,7 @@ def main():
                                              radians(parameters["grabber_open_angle"]),
                                              radians(parameters["grabber_close_angle"]))
 
-        move_servos([rotations], servos)
+        #move_servos([rotations], servos)
         
         for i in range(12):  # reduce jitter when stationary
             servos[i].angle = None
@@ -463,10 +467,10 @@ def main():
         print("searching for objects")
 
         start_time = time.perf_counter()
-        centres, angle, img = detect_objs(img1, img2)
+        centres, angle, img = detect_objs(img1, img2, parameters)
         print(f"Detection time: {round(time.perf_counter() - start_time, 2)}s")
 
-        '''
+        
         plt.imshow(img2, cmap="gray")
         plt.plot([centres[parameters["centre_idx"]][1]*parameters["scaling"]-30*cos(radians(angle)),
                 centres[parameters["centre_idx"]][1]*parameters["scaling"]+30*cos(radians(angle))],
@@ -474,12 +478,13 @@ def main():
                 centres[parameters["centre_idx"]][0]*parameters["scaling"]+30*sin(radians(angle))], c="r")
         for i in range(len(centres)):
             plt.scatter(centres[i][1]*parameters["scaling"], centres[i][0]*parameters["scaling"], c="g" if i == parameters["centre_idx"] else "r")
-        plt.savefig("detected objects.jpg")
-        '''
+        plt.savefig("detected objects.jpg")      
 
         image_height = len(img1)
-        centres = [(x, image_height-y) for x, y in centres]
+        centres = [(x*parameters["scaling"], y*parameters["scaling"]) for x,y in centres]
+        centres = [(image_height-y, x) for y, x in centres]
 
+        angle = radians(angle)
         angle -= pi/2  # convert angle to be zeroed for arm
         while angle < -pi/2:
             angle += pi
@@ -491,8 +496,8 @@ def main():
         print("getting rotations for arm")
 
         route = controller.get_route(angle,
-                                     centres[int(parameters["centre_idx"])][0],
                                      centres[int(parameters["centre_idx"])][1],
+                                     centres[int(parameters["centre_idx"])][0],
                                      parameters["pickup_height"],
                                      parameters["x_arm_length"],
                                      parameters["y_arm_length"],
@@ -500,9 +505,11 @@ def main():
                                      parameters["grabber_open_angle"],
                                      parameters["grabber_close_angle"])
 
-        print("picking up object")
+        print("arm moving")
+        
+        print(route)
 
-        move_servos(route, servos)
+        #move_servos(route, servos)
         
         for i in range(12):  # reduce jitter when stationary
             servos[i].angle = None
@@ -512,4 +519,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
