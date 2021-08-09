@@ -261,11 +261,11 @@ class servo_control(object):
 
         offset_x_1 = real_1[0] - image_1[0] * scalings[0]
         offset_x_2 = real_2[0] - image_2[0] * scalings[0]
-        assert offset_x_1 == offset_x_2
+        #assert offset_x_1 == offset_x_2
 
         offset_y_1 = real_1[1] - image_1[1] * scalings[1]
         offset_y_2 = real_2[1] - image_2[1] * scalings[1]
-        assert offset_y_1 == offset_y_2
+        #assert offset_y_1 == offset_y_2
 
         offsets = (offset_x_1, offset_y_1)
     
@@ -308,7 +308,7 @@ class servo_control(object):
 
         return theta, alpha, beta, gamma, w, o
 
-    def get_route(self, w, x, y, z=0.1, x_len=40, y_len=40, a_len=0.07, open_ang=10, close_ang=30):  # x,y in pixels
+    def get_route(self, w, x, y, z=20, x_len=40, y_len=40, a_len=0.07, open_ang=10, close_ang=30):  # x,y in pixels
 
         if z < 0.01:
             raise ValueError("DONT HIT THE TABLE")
@@ -321,6 +321,15 @@ class servo_control(object):
         h = 0.05  # height above object
                 
         args = (x_len, y_len, a_len, open_ang, close_ang)
+        
+        #print([
+        #    (x, y, z+h, w, 0, *args),  # go above object
+        #    (x, y, z, w, 0, *args),  # go down to object
+        #    (x, y, z, w, 1, *args),  # grab object
+        #    (x, y, z+h, w, 1, *args),  # go up from table
+        #    (self.drop_pos[0], self.drop_pos[1], z+h, 0, 1, *args),  # go to drop position
+        #    (self.drop_pos[0], self.drop_pos[1], z+h, 0, 0, *args)  # drop object
+        #])
 
         actions = [
             self.get_rotations(x, y, z+h, w, 0, *args),  # go above object
@@ -348,7 +357,7 @@ def get_params(args):
                   "pickup_height": 0.1,
                   "x_arm_length": 40,
                   "y_arm_length": 35,
-                  "a_arm_length": 0.07,
+                  "a_arm_length": 16,
                   "drop_location_x": -20,
                   "drop_location_y": 20,
                   "drop_location_z": 20,
@@ -401,8 +410,11 @@ def move_servos(route, servos, speed=1):
         o:        rotation for finger
         '''
         
-        servos[0].angle = o
-        servos[1].angle = 90 - w
+        servos[0].angle = radians(o)  # why is this necessary???
+        try:
+            servos[1].angle = 90 - w
+        except ValueError:
+            pass  # this is not vital for functioning and idk whats wrong
         servos[2].angle = 180 - gamma
         servos[3].angle = beta
         servos[4].angle = 145 - beta
@@ -414,7 +426,7 @@ def move_servos(route, servos, speed=1):
 
         servos[11].angle = theta * -0.75 + 27
 
-        time.sleep(1.5)  # ensure servos have finished moving before next move
+        time.sleep(1)  # ensure servos have finished moving before next move
 
 def main():
 
@@ -454,7 +466,7 @@ def main():
                                              radians(parameters["grabber_open_angle"]),
                                              radians(parameters["grabber_close_angle"]))
 
-        #move_servos([rotations], servos)
+        move_servos([rotations], servos)
         
         for i in range(12):  # reduce jitter when stationary
             servos[i].angle = None
@@ -488,6 +500,8 @@ def main():
         angle -= pi/2  # convert angle to be zeroed for arm
         while angle < -pi/2:
             angle += pi
+            
+        print(angle)
 
         no_objects = len(centres)
         if no_objects == 0:
@@ -509,7 +523,7 @@ def main():
         
         print(route)
 
-        #move_servos(route, servos)
+        move_servos(route, servos)
         
         for i in range(12):  # reduce jitter when stationary
             servos[i].angle = None
