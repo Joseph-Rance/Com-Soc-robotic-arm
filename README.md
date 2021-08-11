@@ -1,3 +1,5 @@
+**WE'RE DONE! Thanks to everyone who took part! ([VIDEO](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/final%20video.mp4))**
+
 # Com-Soc-robotic-arm
 Repo for the code for our robotic arm project
 
@@ -23,11 +25,11 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 
 # TODO
 
-- [ ] finish TODOs in [combined/main.py](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/combined/main.py)
+- [X] finish TODOs in [combined/main.py](https://github.com/Joseph-Rance/Com-Soc-robotic-arm/blob/master/combined/main.py)
 - [x] fix issues with servo power supply (add new cables?)
 - [X] test code with each set of servos ~~+ update code to reduce jitter and allow for gearing~~
 - [X] add servos in at the correct orientation
-- [ ] test arm as whole + fix any problems (inc. fixing horizontal rotate servo, up/down gripper, and checking main.py is up to date with move_arm.py)
+- [X] test arm as whole + fix any problems (inc. fixing horizontal rotate servo, up/down gripper, and checking main.py is up to date with move_arm.py)
 
 # servo offsets
 
@@ -46,4 +48,4 @@ The algorithm also identifies the best angle to rotate the hand to get the best 
 11 -> 22 (inv, gear)
 ```
 
-**Calibration dots are (-10, 30), (10, 30) cm**
+**Calibration dots are (-10, 35), (10, 30) cm**
